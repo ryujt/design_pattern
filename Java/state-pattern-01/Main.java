@@ -19,20 +19,21 @@ class State {
     public void insertCoin() {}
     public void refund() {}
     public void selectItem() {}
-    public void cancelItem() {}
+    public void takeItem() {}
 }
 
 class Main {
     public static void main(String[] args) {
         VendingMachine machine = new VendingMachine();
+
+        Scanner in = new Scanner(System.in);
         while (true) {
-            Scanner in = new Scanner(System.in);
             String line = in.nextLine();
             switch (line) {
                 case "i": machine.getState().insertCoin(); break;
                 case "r": machine.getState().refund(); break;
                 case "s": machine.getState().selectItem(); break;
-                case "c": machine.getState().cancelItem(); break;
+                case "t": machine.getState().takeItem(); break;
                 case "q": return;
             }
         }

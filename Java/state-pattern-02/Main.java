@@ -19,7 +19,7 @@ class State {
     public void insertCoin() {}
     public void refund() {}
     public void selectItem() {}
-    public void cancelItem() {}
+    public void takeItem() {}
 }
 
 class StateNoCoin extends State {
@@ -35,8 +35,8 @@ class StateNoCoin extends State {
         System.out.println("동전을 먼저 넣어 주세요.");
     }
 
-    public  void cancelItem() {
-        System.out.println("상품을 먼저 선택해 주세요.");
+    public void takeItem() {
+        System.out.println("꺼낼 상품이 없습니다.");
     }
 }
 
@@ -51,47 +51,29 @@ class StateHasCoin extends State {
     }
 
     public void selectItem() {
-        context.setState(new ItemReleasing());
+        context.setState(new ItemReleased());
     }
 
-    public void cancelItem() {
-        System.out.println("상품을 먼저 선택해 주세요.");
-    }
-}
-
-class ItemReleasing extends State {
-    public void insertCoin() {
-        System.out.println("상품 배출 중입니다.");
-    }
-
-    public void refund() {
-        System.out.println("상품 배출 중입니다.");
-    }
-
-    public void selectItem() {
-        System.out.println("상품 배출 중입니다.");
-    }
-
-    public void cancelItem() {
-        context.setState(new StateHasCoin());
+    public void takeItem() {
+        System.out.println("꺼낼 상품이 없습니다.");
     }
 }
 
 class ItemReleased extends State {
     public void insertCoin() {
-        System.out.println("상품 배출 완료, 잠시만 기다려주세요.");
+        System.out.println("상품을 먼저 꺼내주세요.");
     }
 
     public void refund() {
-        System.out.println("상품 배출 완료, 잠시만 기다려주세요.");
+        System.out.println("반환 할 동전이 없습니다.");
     }
 
     public void selectItem() {
-        System.out.println("상품 배출 완료, 잠시만 기다려주세요.");
+        System.out.println("상품을 먼저 꺼내주세요.");
     }
 
-    public void cancelItem() {
-        System.out.println("상품 배출 완료, 잠시만 기다려주세요.");
+    public void takeItem() {
+        context.setState(new StateNoCoin());
     }
 }
 
@@ -99,14 +81,15 @@ class Main {
     public static void main(String[] args) {
         VendingMachine machine = new VendingMachine();
         machine.setState(new StateNoCoin());
+
+        Scanner in = new Scanner(System.in);
         while (true) {
-            Scanner in = new Scanner(System.in);
             String line = in.nextLine();
             switch (line) {
                 case "i": machine.getState().insertCoin(); break;
                 case "r": machine.getState().refund(); break;
                 case "s": machine.getState().selectItem(); break;
-                case "c": machine.getState().cancelItem(); break;
+                case "t": machine.getState().takeItem(); break;
                 case "q": return;
             }
         }
