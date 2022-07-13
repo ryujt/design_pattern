@@ -8,7 +8,7 @@
 
 ## 강의 개요
 
-이번 강의에서는 State 패턴이 무엇이고 언제 사용하는 지에 대해서 알아봅니다.
+이번 강의에서는 Command 패턴이 무엇이고 언제 사용하는 지에 대해서 알아봅니다.
 
 우선 위키백과의 정의를 살펴보면 다음과 같습니다.
 
@@ -26,59 +26,33 @@
 ## 미션
 
 ![](./pic-02.png)
+![](./pic-03.png)
 
 
 ## 패턴 적용 전의 코드
 
-``` java
-import java.util.Scanner;
-
-class Shape {
-    final static int SHAPE_TRIANGLE = 0;
-    final static int SHAPE_RECTANGLE = 1;
-    final static int SHAPE_CIRCLE = 2;
-
-    int type;
-    int x;
-    int y;
-
-    Shape(int type, int x, int y) {
-        this.type = type;
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class Painter {
-    public void execute(Shape shape)
-    {
-        switch (shape.type) {
-            case Shape.SHAPE_TRIANGLE:
-                System.out.println(String.format("삼각형 그리기 - x: %d, y: %d", shape.x, shape.y));
-                break;
-            case Shape.SHAPE_RECTANGLE:
-                System.out.println(String.format("사각형 그리기 - x: %d, y: %d", shape.x, shape.y));
-                break;
-            case Shape.SHAPE_CIRCLE:
-                System.out.println(String.format("원 그리기 - x: %d, y: %d", shape.x, shape.y));
-                break;
+``` js
+class Socket {
+    void onReceived(command, params) {
+        switch (command) {
+            case "upload": fileController.upload(params); break;
+            case "askList": fileController.askList(params); break;
+            case "delete": fileController.delete(params); break;
         }
     }
 }
 
-public class Main {
-    public static void main(String[] args) {
-        Painter painter = new Painter();
-        Scanner in = new Scanner(System.in);
-        while (true) {
-            String line = in.nextLine();
-            switch (line) {
-                case "t": painter.execute(new Shape(Shape.SHAPE_TRIANGLE, 0, 0)); break;
-                case "r": painter.execute(new Shape(Shape.SHAPE_RECTANGLE, 10, 10)); break;
-                case "c": painter.execute(new Shape(Shape.SHAPE_CIRCLE, 100, 100)); break;
-                case "q": return;
-            }
-        }
+class FileController {
+    void upload(params) {
+        //
+    }
+
+    void askList(params) {
+        //
+    }
+
+    void delete(params) {
+        //
     }
 }
 ```
@@ -86,86 +60,19 @@ public class Main {
 ## Command 패턴 적용 후
 
 ``` java
-import java.util.Scanner;
-
-class Shape {
-    final static int SHAPE_TRIANGLE = 0;
-    final static int SHAPE_RECTANGLE = 1;
-    final static int SHAPE_CIRCLE = 2;
-
-    int type;
-    int x;
-    int y;
-
-    Shape(int type, int x, int y) {
-        this.type = type;
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class DrawCommand {
-    int x;
-    int y;
-
-    DrawCommand(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public void execute() {}
-}
-
-class DrawTriangle extends DrawCommand {
-    DrawTriangle(int x, int y) {
-        super(x, y);
-    }
-
-    public void execute() {
-        System.out.println(String.format("삼각형 그리기 - x: %d, y: %d", x, y));
-    }
-}
-
-class DrawRectangle extends DrawCommand {
-    DrawRectangle(int x, int y) {
-        super(x, y);
-    }
-
-    public void execute() {
-        System.out.println(String.format("사각형 그리기 - x: %d, y: %d", x, y));
-    }
-}
-
-class DrawCircle extends DrawCommand {
-    DrawCircle(int x, int y) {
-        super(x, y);
-    }
-
-    public void execute() {
-        System.out.println(String.format("원 그리기 - x: %d, y: %d", x, y));
-    }
-}
-
-class Painter {
-    public void execute(DrawCommand command)
-    {
-        command.execute();
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Painter painter = new Painter();
-        Scanner in = new Scanner(System.in);
-        while (true) {
-            String line = in.nextLine();
-            switch (line) {
-                case "t": painter.execute(new DrawTriangle(0, 0)); break;
-                case "r": painter.execute(new DrawRectangle(10, 10)); break;
-                case "c": painter.execute(new DrawCircle(100, 100)); break;
-                case "q": return;
-            }
+class Socket {
+    void onReceived(command, params) {
+        switch (command) {
+            case "upload": fileController.execute(new CommandUpload(params)); break;
+            case "askList": fileController.askList(new CommandGetList(params)); break;
+            case "delete": fileController.delete(new CommandDelete(params)); break;
         }
+    }
+}
+
+class FileController {
+    void execute(command) {
+        command.execute();
     }
 }
 ```
@@ -174,41 +81,13 @@ public class Main {
 ## undo 기능 추가
 
 ``` java
-...
-class DrawCommand {
+class CommandDelete {
     ...
     public void execute() {}
-    public void undo() { }
+    public void undo() {
+        //
+    }
 }
 ...
-class Painter {
-    public void execute(DrawCommand command)
-    {
-        command.execute();
-        lastCommand = command;
-    }
-
-    public void undo() {
-        if (lastCommand != null) lastCommand.undo();
-    }
-
-    private DrawCommand lastCommand = null;
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Painter painter = new Painter();
-        Scanner in = new Scanner(System.in);
-        while (true) {
-            String line = in.nextLine();
-            switch (line) {
-                case "t": painter.execute(new DrawTriangle(0, 0)); break;
-                case "r": painter.execute(new DrawRectangle(10, 10)); break;
-                case "c": painter.execute(new DrawCircle(100, 100)); break;
-                case "b":  painter.undo(); break;
-                case "q": return;
-            }
-        }
-    }
 }
 ```
