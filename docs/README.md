@@ -1,5 +1,5 @@
 # Design pattern
 
-* [Strategy pattern](/oop/design-pattern-2/)
-* [State pattern](/oop/design-pattern-1/)
-* [Command pattern](/oop/design-pattern-4/)
+* [Strategy pattern](./002/)
+* [State pattern](./001/)
+* [Command pattern](./004/)
