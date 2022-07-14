@@ -25,8 +25,8 @@
 
 ## 미션
 
-![](./pic-02.png)
 ![](./pic-03.png)
+![](./pic-02.png)
 
 
 ## 패턴 적용 전의 코드
@@ -85,9 +85,29 @@ class CommandDelete {
     ...
     public void execute() {}
     public void undo() {
-        //
+        // TODO: 휴지통에서 꺼내오기 (파일 지울 때 보관처리)
     }
 }
-...
+
+class Socket {
+    void onReceived(command, params) {
+        switch (command) {
+            ...
+            case "undo": fileController.undo(); break;
+        }
+    }
+}
+
+class FileController {
+    void execute(command) {
+        command.execute();
+        history.push(command);
+    }
+
+    void undo() {
+        const command = history.pop();
+        command.undo();
+    }
+}
 }
 ```
